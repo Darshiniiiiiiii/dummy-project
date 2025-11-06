@@ -21,7 +21,8 @@ FROM amazoncorretto:17-jre-alpine-full
 ARG JAR_FILE=target/*.jar
 
 # Copy the packaged JAR file from the 'builder' stage
-COPY --from=builder /app/ app.jar
+# Copy the packaged JAR file from the 'builder' stage
+COPY --from=builder /app/${JAR_FILE} app.jar
 
 # Define the port the container will expose (change if your app uses a different port)
 EXPOSE 8080
