@@ -6,17 +6,17 @@ pipeline {
     // Define environment variables for the pipeline
     environment {
         // !!! REPLACE THESE PLACEHOLDERS !!!
-        ECR_REGISTRY = 'YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_AWS_REGION.amazonaws.com/myapp-repo'
+        ECR_REGISTRY = '405721655829.dkr.ecr.us-east-1.amazonaws.com/devops'
         
         // This tag ensures the image is unique for every build
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         
         // Set your ECS service and cluster names
-        ECS_CLUSTER_NAME = 'MyAppCluster' 
-        ECS_SERVICE_NAME = 'MyAppService'
+        ECS_CLUSTER_NAME = 'devops_cluster' 
+        ECS_SERVICE_NAME = 'devops_service'
         
         // The Jenkins credential ID you created in Phase I
-        AWS_CREDENTIALS_ID = 'aws-jenkins-creds'
+        AWS_CREDENTIALS_ID = 'DARSHINI'
     }
 
     stages {
