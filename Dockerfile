@@ -14,8 +14,8 @@ COPY src /app/src
 RUN mvn clean package -DskipTests
 
 # --- Stage 2: Create the Final Runtime Image ---
-# FIX: Use the reliable, minimal OpenJDK JRE image for the final, lightweight production container.
-FROM openjdk:17-jre-slim
+# FIX: Use a universally available and reliable openjdk slim tag
+FROM openjdk:17-slim-buster
 
 # Set the entry point variable
 ARG JAR_FILE=target/*.jar
