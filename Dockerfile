@@ -14,9 +14,8 @@ COPY src /app/src
 RUN mvn clean package -DskipTests
 
 # --- Stage 2: Create the Final Runtime Image ---
-# Use a minimal JRE image for the final production environment
-# FIX: Use the correct, available Amazon Corretto Alpine JRE tag
-FROM amazoncorretto:17-alpine-jre 
+# FIX: Using the highly stable Eclipse Temurin JRE on Alpine
+FROM eclipse-temurin:17-jre-alpine
 
 # Set the entry point variable
 ARG JAR_FILE=target/*.jar
