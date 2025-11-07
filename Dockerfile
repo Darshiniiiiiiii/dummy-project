@@ -15,7 +15,7 @@ RUN mvn clean package -DskipTests
 
 # --- Stage 2: Create the Final Runtime Image ---
 # Use a minimal JRE image for the final production environment
-FROM amazoncorretto:17-jre-alpine-full
+FROM amazoncorretto:17-jre-alpine-jre
 
 # Set the entry point variable
 ARG JAR_FILE=target/*.jar
