@@ -1,4 +1,4 @@
-FROM maven:3.9.5-amazoncorretto-17 AS builder
+FROM maven:3.9.5-amazoncorretto-17 AS build_env
 
 # Set the working directory inside the container
 WORKDIR /app
