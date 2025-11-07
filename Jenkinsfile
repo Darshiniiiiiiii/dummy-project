@@ -39,7 +39,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${ECR_REGISTRY}:${IMAGE_TAG}"
-                sh "docker build -t ${ECR_REGISTRY}:${IMAGE_TAG} ."
+                sh "docker build --no-cache -t ${ECR_REGISTRY}:${IMAGE_TAG} ."
             }
         }
         
