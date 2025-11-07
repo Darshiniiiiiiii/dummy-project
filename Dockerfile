@@ -15,8 +15,7 @@ RUN mvn clean package -DskipTests
 
 # --- Stage 2: Create the Final Runtime Image ---
 # FIX: Using the highly stable Eclipse Temurin JRE on Alpine
-FROM eclipse-temurin:17-jre-alpine
-
+FROM maven:3.9.5-amazoncorretto-17 AS builder
 # Set the entry point variable
 ARG JAR_FILE=target/*.jar
 
