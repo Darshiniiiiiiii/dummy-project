@@ -12,10 +12,14 @@ pipeline {
         AWS_CREDENTIALS_ID = 'DARSHINI' 
         
         // --- ECS Target Names ---
-        ECS_CLUSTER_NAME = 'devops_cluster'  
+        ECS_CLUSTER_NAME = 'devops_cluster' 
         ECS_SERVICE_NAME = 'devops_service'
         // Image Tag
         IMAGE_TAG = "${env.BUILD_NUMBER}"
+        
+        // --- Task Definition Details (MUST match AWS console) ---
+        TASK_DEF_FAMILY = 'myapp-task-family' // Ensure this matches the Family name in AWS ECS
+        CONTAINER_NAME = 'myapp-container'     // Ensure this matches the Container Name in your Task Definition
     }
 
     stages {
@@ -42,7 +46,6 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 echo 'Pushing image to ECR...'
-                // Finalized Push with correct Region variable
                 withAWS(credentials: AWS_CREDENTIALS_ID, region: AWS_REGION) {
                     sh "docker push ${ECR_REGISTRY}:${IMAGE_TAG}"
                 }
@@ -51,19 +54,28 @@ pipeline {
         
         stage('Deploy to ECS') {
             steps {
-                echo 'Updating ECS Service to deploy new image...'
-                // Finalized Deployment logic using the ecsDeploy step
+                echo 'Registering new Task Definition and updating ECS Service...'
+                
+                // Use the AWS credentials and region defined in the environment block
                 withAWS(credentials: AWS_CREDENTIALS_ID, region: AWS_REGION) {
-                    ecsDeploy(
-                        cluster: ECS_CLUSTER_NAME,
-                        service: ECS_SERVICE_NAME,
-                        // Assumed Task Definition Family and Container Name from previous steps:
-                        taskDefinition: "myapp-task-family", 
-                        container: 'myapp-container',
-                        image: "${ECR_REGISTRY}:${IMAGE_TAG}"
-                    )
+                    
+                    // 1. Register a new Task Definition revision
+                    sh """
+                        # Retrieve the active task definition JSON
+                        TASK_DEF_JSON=\$(aws ecs describe-task-definition --task-definition \$TASK_DEF_FAMILY --query taskDefinition --output json)
+                        
+                        # Use jq to update the image tag, and remove ARN/revision fields
+                        NEW_TASK_DEF=\$(echo \$TASK_DEF_JSON | jq '.containerDefinitions[] |= if .name == "\$CONTAINER_NAME" then .image = "\$ECR_REGISTRY:\$IMAGE_TAG" else . end' | jq 'del(.taskDefinitionArn)' | jq 'del(.revision)' | jq 'del(.status)' | jq 'del(.requiresAttributes)' | jq 'del(.compatibilities)')
+                        
+                        # Register the new revision
+                        aws ecs register-task-definition --cli-input-json "\$NEW_TASK_DEF"
+                    """
+
+                    // 2. Update the ECS Service to force a new deployment of the latest revision
+                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment"
+                    
+                    echo 'Deployment complete! The new image is rolling out.'
                 }
-                echo 'Deployment stage complete.'
             }
         }
     }
