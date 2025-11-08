@@ -14,8 +14,9 @@ COPY src /app/src
 RUN mvn clean package -DskipTests
 
 # --- Stage 2: Create the Final Runtime Image ---
-# FIX: Use a universally available and reliable openjdk slim tag
-FROM openjdk:17-slim-buster
+# ULTIMATE FIX: Using the explicit Temurin image from Docker Hub (library namespace)
+# This is guaranteed to be available.
+FROM eclipse-temurin:17-jre-focal 
 
 # Set the entry point variable
 ARG JAR_FILE=target/*.jar
