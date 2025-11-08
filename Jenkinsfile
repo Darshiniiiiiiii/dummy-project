@@ -45,15 +45,19 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                echo 'Pushing image to ECR...'
+                echo 'Authenticating with ECR via AWS CLI and pushing image...'
                 
-                // CRITICAL FIX: Get temporary ECR credentials using withDockerRegistry
-                withDockerRegistry(
-                    credentialsId: AWS_CREDENTIALS_ID, 
-                    url: "https://${ECR_REGISTRY}" 
-                ) {
-                    // This command runs inside the authenticated session
-                    sh "docker push ${ECR_REGISTRY}:${IMAGE_TAG}"
+                withAWS(credentials: AWS_CREDENTIALS_ID, region: AWS_REGION) {
+                    sh """
+                        # 1. Get ECR Authentication Token using the AWS CLI
+                        ECR_TOKEN=\$(aws ecr get-login-password --region ${AWS_REGION})
+                        
+                        # 2. Log Docker into ECR using the token as the password
+                        echo \$ECR_TOKEN | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                        
+                        # 3. Push the image
+                        docker push ${ECR_REGISTRY}:${IMAGE_TAG}
+                    """
                 }
             }
         }
