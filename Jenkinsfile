@@ -42,11 +42,17 @@ pipeline {
                 sh "docker build --no-cache -t ${ECR_REGISTRY}:${IMAGE_TAG} ."
             }
         }
-        
+
         stage('Push to ECR') {
             steps {
                 echo 'Pushing image to ECR...'
-                withAWS(credentials: AWS_CREDENTIALS_ID, region: AWS_REGION) {
+                
+                // CRITICAL FIX: Get temporary ECR credentials using withDockerRegistry
+                withDockerRegistry(
+                    credentialsId: AWS_CREDENTIALS_ID, 
+                    url: "https://${ECR_REGISTRY}" 
+                ) {
+                    // This command runs inside the authenticated session
                     sh "docker push ${ECR_REGISTRY}:${IMAGE_TAG}"
                 }
             }
