@@ -1,25 +1,16 @@
-// Jenkinsfile (Groovy Script)
 pipeline {
     agent any
     
     environment {
-        // --- Confirmed AWS Details ---
-        // Your AWS Account ID and ECR Repository Name
         ECR_REGISTRY = '405721655829.dkr.ecr.us-east-1.amazonaws.com/devops'
-        // Your AWS Region (critical for AWS SDK calls)
         AWS_REGION = 'us-east-1' 
-        // Your Jenkins Credential ID (for ECR login and ECS update)
         AWS_CREDENTIALS_ID = 'DARSHINI' 
-        
-        // --- ECS Target Names ---
         ECS_CLUSTER_NAME = 'devops_cluster' 
         ECS_SERVICE_NAME = 'devops_service'
-        // Image Tag
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        
-        // --- Task Definition Details (MUST match AWS console) ---
-        TASK_DEF_FAMILY = 'myapp-task-family' // Ensure this matches the Family name in AWS ECS
-        CONTAINER_NAME = 'myapp-container'     // Ensure this matches the Container Name in your Task Definition
+
+        TASK_DEF_FAMILY = 'myapp-task-family' 
+        CONTAINER_NAME = 'myapp-container'    
     }
 
     stages {
