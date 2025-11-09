@@ -62,19 +62,33 @@ pipeline {
             }
         }
         
-        stage('Deploy to ECS') {
+stage('Deploy to ECS') {
             steps {
                 echo 'Registering new Task Definition and updating ECS Service...'
                 
                 withAWS(credentials: AWS_CREDENTIALS_ID, region: AWS_REGION) {
+                    
+                    // 1. Register a new Task Definition revision
                     sh """
-                        # Retrieve, update (with jq), and register a new Task Definition revision
+                        # Retrieve the active task definition JSON
                         TASK_DEF_JSON=\$(aws ecs describe-task-definition --task-definition \$TASK_DEF_FAMILY --query taskDefinition --output json)
-                        NEW_TASK_DEF=\$(echo \$TASK_DEF_JSON | jq '.containerDefinitions[] |= if .name == "\$CONTAINER_NAME" then .image = "\$ECR_REGISTRY:\$IMAGE_TAG" else . end' | jq 'del(.taskDefinitionArn)' | jq 'del(.revision)' | jq 'del(.status)' | jq 'del(.requiresAttributes)' | jq 'del(.compatibilities)')
+                        
+                        # CRITICAL FIX: Use jq to update image tag AND remove all invalid metadata fields
+                        NEW_TASK_DEF=\$(echo \$TASK_DEF_JSON | \
+                            jq '.containerDefinitions[] |= if .name == "\$CONTAINER_NAME" then .image = "\$ECR_REGISTRY:\$IMAGE_TAG" else . end' | \
+                            jq 'del(.taskDefinitionArn)' | \
+                            jq 'del(.revision)' | \
+                            jq 'del(.status)' | \
+                            jq 'del(.requiresAttributes)' | \
+                            jq 'del(.compatibilities)' | \
+                            jq 'del(.registeredAt)' | \
+                            jq 'del(.registeredBy)')
+                        
+                        # Register the new revision
                         aws ecs register-task-definition --cli-input-json "\$NEW_TASK_DEF"
                     """
 
-                    // Update the ECS Service
+                    // 2. Update the ECS Service to force a new deployment of the latest revision
                     sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment"
                     
                     echo 'Deployment complete! The new image is rolling out.'
