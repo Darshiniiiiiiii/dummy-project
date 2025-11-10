@@ -98,7 +98,7 @@ pipeline {
             emailext (
                 subject: "SUCCESS: Pipeline ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
                 body: "Deployment SUCCESSFUL! Application is running on AWS. Log: ${env.BUILD_URL}/console",
-                to: 'darshini22110427@snuchennai.edu.in' 
+                to: 'darshinipremkumar24@gmail.com' 
             )
         }
         // Send email on failure
@@ -106,7 +106,7 @@ pipeline {
             emailext (
                 subject: "FAILURE: Pipeline ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
                 body: "Deployment FAILED. Please check Jenkins console for errors. Log: ${env.BUILD_URL}/console",
-                to: 'darshini22110427@snuchennai.edu.in', 
+                to: 'darshinipremkumar24@gmail.com', 
                 attachLog: true
             )
         }
