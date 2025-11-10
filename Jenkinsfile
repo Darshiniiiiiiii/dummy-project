@@ -106,7 +106,7 @@ pipeline {
             emailext (
                 subject: "FAILURE: Pipeline ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
                 body: "Deployment FAILED. Please check Jenkins console for errors. Log: ${env.BUILD_URL}/console",
-                to: 'your.email.address@example.com', // <<== UPDATE THIS
+                to: 'darshini22110427@snuchennai.edu.in', 
                 attachLog: true
             )
         }
