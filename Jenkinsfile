@@ -3,7 +3,7 @@ pipeline {
     agent any
     
     environment {
-        // --- AWS Details ---
+        // --- AWS Details
         ECR_REGISTRY = '405721655829.dkr.ecr.us-east-1.amazonaws.com/devops'
         AWS_REGION = 'us-east-1' 
         AWS_CREDENTIALS_ID = 'DARSHINI' 
