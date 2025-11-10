@@ -98,7 +98,7 @@ pipeline {
             emailext (
                 subject: "SUCCESS: Pipeline ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
                 body: "Deployment SUCCESSFUL! Application is running on AWS. Log: ${env.BUILD_URL}/console",
-                to: 'your.email.address@example.com' // <<== UPDATE THIS
+                to: 'darshini22110427@snuchennai.edu.in' 
             )
         }
         // Send email on failure
