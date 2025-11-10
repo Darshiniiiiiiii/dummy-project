@@ -1,27 +1,19 @@
 FROM maven:3.9.5-amazoncorretto-17 AS build_env
-
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml and download dependencies first (for better layer caching)
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
-# Copy the rest of the source code
+
 COPY src /app/src
 
-# Package the application into a JAR file (assuming a Spring Boot or similar structure)
 RUN mvn clean package -DskipTests
 
-# --- Stage 2: Create the Final Runtime Image ---
-# ULTIMATE FIX: Using the explicit Temurin image from Docker Hub (library namespace)
-# This is guaranteed to be available.
 FROM eclipse-temurin:17-jre-focal 
 
-# Set the entry point variable
+
 ARG JAR_FILE=target/*.jar
 
-# Copy the packaged JAR file from the 'build_env' stage (reference the first stage's alias)
 COPY --from=build_env /app/${JAR_FILE} app.jar
 
 # Define the port the container will expose (change if your app uses a different port)
