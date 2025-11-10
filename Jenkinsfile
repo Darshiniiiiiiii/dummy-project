@@ -85,15 +85,13 @@ pipeline {
         }
     }
     
-    // ====================================================================
-    // MONITORING & LOGGING STEP: EMAIL NOTIFICATIONS (REQUIRED SUBMISSION CODE)
-    // ====================================================================
+
     post {
-        // Clean up workspace after build
+        
         always {
             cleanWs()
         }
-        // Send email on success
+        
         success {
             emailext (
                 subject: "SUCCESS: Pipeline ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
@@ -101,7 +99,7 @@ pipeline {
                 to: 'darshinipremkumar24@gmail.com' 
             )
         }
-        // Send email on failure
+        
         failure {
             emailext (
                 subject: "FAILURE: Pipeline ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
